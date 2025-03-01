@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   backend:
-    image: ghcr.io/vrsen/agency-swarm-backend:latest
+    build:
+      context: .
+      dockerfile: backend/Dockerfile  # Ensure this file exists
     container_name: agency-backend
     restart: always
     ports:
@@ -10,14 +12,34 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - BACKEND_PORT=3001
+    volumes:
+      - ./backend:/app  # Ensures backend code persists
     depends_on:
       - frontend
 
   frontend:
-    image: ghcr.io/vrsen/agency-swarm-frontend:latest
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile  # Ensure this file exists
     container_name: agency-frontend
     restart: always
     ports:
       - "3000:3000"
     depends_on:
       - backend
+
+  postgres:
+    image: postgres:latest
+    container_name: agency-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: agency_swarm
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
