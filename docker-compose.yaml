@@ -15,7 +15,7 @@ services:
     volumes:
       - ./backend:/app  # Ensures backend code persists
     depends_on:
-      - frontend
+      - postgres
 
   frontend:
     build:
